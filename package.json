@@ -20,7 +20,10 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "ci": "npm run lint && npm run format:check && npm run typecheck && npm run test && npm run build"
+    "ci": "npm run lint && npm run format:check && npm run typecheck && npm run test && npm run build",
+    "build:cloudflare": "next build --webpack && opennextjs-cloudflare build --skipNextBuild",
+    "preview:cloudflare": "opennextjs-cloudflare preview -- --port 3000",
+    "deploy:cloudflare": "opennextjs-cloudflare deploy"
   },
   "overrides": {
     "@babel/core": "7.29.7",
@@ -41,8 +44,8 @@
   },
   "dependencies": {
     "@base-ui/react": "1.3.0",
-    "@xyflow/react": "12.10.1",
     "@xmldom/xmldom": "0.9.10",
+    "@xyflow/react": "12.10.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fflate": "^0.8.2",
@@ -61,6 +64,7 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "1.20.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
@@ -68,6 +72,7 @@
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "esbuild": "0.25.4",
     "eslint": "9.39.4",
     "eslint-config-next": "16.2.12",
     "eslint-plugin-react-hooks": "7.0.1",
@@ -75,6 +80,7 @@
     "prettier": "3.9.6",
     "tailwindcss": "^4",
     "typescript": "5.9.3",
-    "vitest": "4.1.10"
+    "vitest": "4.1.10",
+    "wrangler": "^4.127.1"
   }
 }

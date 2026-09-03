@@ -4,6 +4,15 @@ An open-source editor for **animated technical diagrams**, built with React Flow
 
 This is the **whole product as one app**: the editor engine and the web application live together in a single Next.js project. Clone it, install it, run it — that's the entire setup.
 
+<div align="center">
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdimasna%2Fdrawcms-app)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/dimasna/drawcms-app)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/dimasna/drawcms-app)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/dimasna/drawcms-app)
+
+</div>
+
 ## Quick Start
 
 ```bash
@@ -61,16 +70,16 @@ can create animated diagrams directly on the live canvas: no API keys, no
 servers, no simulated pointer input. The agent calls the editor's tools like
 any other tool, and you watch the diagram build itself.
 
-| Tool | What it does |
-| --- | --- |
-| `drawcms_get_diagram` | Read the current diagram — nodes, connectors, motion, presentation steps |
-| `drawcms_get_visual_grammar` | Explore the visual dictionary: elements, semantic uses, motion guidance |
-| `drawcms_recommend_visuals` | Recommend elements, connectors, motion presets, and playback order from a description |
-| `drawcms_replace_diagram` | Build a complete animated diagram in one call |
-| `drawcms_edit_diagram` | Add, update, delete, and connect elements as one undoable batch |
-| `drawcms_set_motion` | Retime animation without touching structure |
-| `drawcms_set_story` | Write the presentation step sequence |
-| `drawcms_validate_diagram` | Check a diagram before committing it |
+| Tool                         | What it does                                                                          |
+| ---------------------------- | ------------------------------------------------------------------------------------- |
+| `drawcms_get_diagram`        | Read the current diagram — nodes, connectors, motion, presentation steps              |
+| `drawcms_get_visual_grammar` | Explore the visual dictionary: elements, semantic uses, motion guidance               |
+| `drawcms_recommend_visuals`  | Recommend elements, connectors, motion presets, and playback order from a description |
+| `drawcms_replace_diagram`    | Build a complete animated diagram in one call                                         |
+| `drawcms_edit_diagram`       | Add, update, delete, and connect elements as one undoable batch                       |
+| `drawcms_set_motion`         | Retime animation without touching structure                                           |
+| `drawcms_set_story`          | Write the presentation step sequence                                                  |
+| `drawcms_validate_diagram`   | Check a diagram before committing it                                                  |
 
 ### Human + agent collaboration
 
@@ -80,9 +89,9 @@ reversible with a single Cmd+Z — retimes motion without rebuilding structure,
 and rewrites presentation narration while your manual edits and undo history
 stay intact. Browsers without WebMCP simply render the ordinary editor.
 
-Try a prompt like: *"Build an animated diagram of a checkout request flowing
+Try a prompt like: _"Build an animated diagram of a checkout request flowing
 through the API gateway, queue, and database, then narrate it in three
-presentation steps."* Agent authoring details live at
+presentation steps."_ Agent authoring details live at
 [docs.drawcms.com](https://docs.drawcms.com/).
 
 ## Tech Stack
