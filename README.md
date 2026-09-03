@@ -29,7 +29,7 @@ Open http://localhost:3002 — the app is the editor itself and redirects there 
 - **Export** — PNG, animated GIF, and the portable `.drawcms` document format
 - **Accessible** — keyboard-complete chrome, named controls, and `prefers-reduced-motion` support
 - **Extensible** — versioned plugin/host API and persistence adapters for custom storage backends
-- **Agent-ready (experimental)** — WebMCP tools let a browser agent read, build, incrementally edit, and preview animated diagrams without simulating pointer input
+- **Agent-ready (experimental)** — built-in WebMCP tools let AI agents like ChatGPT create and animate diagrams directly on the live canvas (see [Build diagrams with an AI agent](#build-diagrams-with-an-ai-agent-webmcp))
 - **Undo/Redo** — full history with keyboard shortcuts
 - **Clipboard** — cut, copy, paste with ID remapping
 
@@ -51,6 +51,39 @@ src/
 pill, theming, and the "Made with DrawCMS" badge. Both layers talk through the
 editor's public API (`src/editor/index.ts`) and the persistence boundary
 (DM-014), so you can swap storage backends without touching canvas code.
+
+## Build diagrams with an AI agent (WebMCP)
+
+The editor registers a WebMCP toolset with the browser's native
+`navigator.modelContext` API. In an agent-capable browser — ChatGPT's agentic
+browsing or any WebMCP-compatible agent host — open the editor and the agent
+can create animated diagrams directly on the live canvas: no API keys, no
+servers, no simulated pointer input. The agent calls the editor's tools like
+any other tool, and you watch the diagram build itself.
+
+| Tool | What it does |
+| --- | --- |
+| `drawcms_get_diagram` | Read the current diagram — nodes, connectors, motion, presentation steps |
+| `drawcms_get_visual_grammar` | Explore the visual dictionary: elements, semantic uses, motion guidance |
+| `drawcms_recommend_visuals` | Recommend elements, connectors, motion presets, and playback order from a description |
+| `drawcms_replace_diagram` | Build a complete animated diagram in one call |
+| `drawcms_edit_diagram` | Add, update, delete, and connect elements as one undoable batch |
+| `drawcms_set_motion` | Retime animation without touching structure |
+| `drawcms_set_story` | Write the presentation step sequence |
+| `drawcms_validate_diagram` | Check a diagram before committing it |
+
+### Human + agent collaboration
+
+The agent edits the same canvas you do, so working together is co-editing, not
+file handoff. It refines an existing diagram one undoable batch at a time —
+reversible with a single Cmd+Z — retimes motion without rebuilding structure,
+and rewrites presentation narration while your manual edits and undo history
+stay intact. Browsers without WebMCP simply render the ordinary editor.
+
+Try a prompt like: *"Build an animated diagram of a checkout request flowing
+through the API gateway, queue, and database, then narrate it in three
+presentation steps."* Agent authoring details live at
+[docs.drawcms.com](https://docs.drawcms.com/).
 
 ## Tech Stack
 
