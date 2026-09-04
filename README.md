@@ -6,6 +6,8 @@ This is the **whole product as one app**: the editor engine and the web applicat
 
 <div align="center">
 
+![DrawCMS demo — building an animated diagram with an agent](docs/demo.gif)
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdimasna%2Fdrawcms-app)
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/dimasna/drawcms-app)
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/dimasna/drawcms-app)
