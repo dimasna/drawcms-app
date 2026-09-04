@@ -1,11 +1,6 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { EditorHost } from "../editor-host";
-
+/** The editor now lives at /; keep legacy /editor links working. */
 export default function EditorPage() {
-  return (
-    <div className="h-screen w-screen overflow-hidden">
-      <EditorHost />
-    </div>
-  );
+  redirect("/");
 }
