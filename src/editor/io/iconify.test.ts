@@ -2,8 +2,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ICONIFY_API_HOST,
+  ICON_BODY_MAX_LENGTH,
   IconifyError,
   fetchIconArtwork,
+  sanitizeIconBody,
   sanitizeIconSvg,
   searchIcons,
 } from "./iconify";
@@ -119,6 +121,44 @@ describe("sanitizeIconSvg", () => {
     const { viewBox } = sanitizeIconSvg('<svg><path d="M0 0h24v24H0z"/></svg>', "lucide:test");
 
     expect(viewBox).toBe("0 0 24 24");
+  });
+});
+
+describe("sanitizeIconBody", () => {
+  it("passes through benign markup unchanged", () => {
+    expect(sanitizeIconBody('<path d="M3 9l9-7 9 7"></path>')).toBe(
+      '<path d="M3 9l9-7 9 7"></path>',
+    );
+  });
+
+  it("strips event handlers, forbidden tags, styles, and external links from stored bodies", () => {
+    const body = sanitizeIconBody(
+      '<script>alert(1)</script><path d="M0 0h24v24H0z" onclick="alert(1)" style="fill:red"/><foreignObject><img src="x" onerror="alert(1)"/></foreignObject><animate onbegin="alert(1)" attributeName="href"/><a href="javascript:alert(1)"><text>x</text></a><image href="https://evil.example/t.png"/>',
+    );
+
+    expect(body).not.toContain("script");
+    expect(body).not.toContain("foreignObject");
+    expect(body).not.toContain("img");
+    expect(body).not.toContain("onerror");
+    expect(body).not.toContain("onbegin");
+    expect(body).not.toContain("animate");
+    expect(body).not.toContain("javascript:");
+    expect(body).not.toContain("evil.example");
+    expect(body).not.toContain('style="fill:red"');
+    expect(body).toContain('<path d="M0 0h24v24H0z"></path>');
+  });
+
+  it("drops content that escapes the svg fragment boundary", () => {
+    const body = sanitizeIconBody('</svg><img src="x" onerror="alert(1)"/><path d="M1 1h2v2H1z"/>');
+
+    expect(body).not.toContain("img");
+    expect(body).not.toContain("onerror");
+  });
+
+  it("collapses empty, non-string, and oversized bodies to empty markup", () => {
+    expect(sanitizeIconBody("")).toBe("");
+    expect(sanitizeIconBody(undefined as unknown as string)).toBe("");
+    expect(sanitizeIconBody("<path/>".repeat(ICON_BODY_MAX_LENGTH / 7 + 1))).toBe("");
   });
 });
 

@@ -43,6 +43,7 @@ import {
 import type { StoryTarget } from "../story/model";
 import { STORY_ACTIVE_FILL, STORY_ACTIVE_STROKE, STORY_ACTIVE_TEXT } from "../story/highlight";
 import { ALL_CONTAINER_TYPES } from "../constants";
+import { sanitizeIconBody } from "../io/iconify";
 import type { AppEdge, AppNode } from "../types";
 import {
   getSemanticLabelPlacement,
@@ -179,6 +180,12 @@ const CustomShapeNode = ({ id, data, selected }: { id: string; data: any; select
   ]);
   const hasCustomImage = data.type === "image" && data.imageUrl;
   const isIconNode = data.type === "icon" && typeof data.iconBody === "string";
+  // Stored icon bodies re-enter the app from files, storage, and hosts —
+  // re-apply the SVG trust boundary at render time (DM-SEC-1).
+  const sanitizedIconBody = useMemo(
+    () => (isIconNode ? sanitizeIconBody(String(data.iconBody)) : ""),
+    [isIconNode, data.iconBody],
+  );
   const isCloudShape = data.type === "cloud";
   const semanticLabelPlacement = getSemanticLabelPlacement(data.type as string);
   const semanticLabelClassName =
@@ -671,7 +678,7 @@ const CustomShapeNode = ({ id, data, selected }: { id: string; data: any; select
             viewBox={String(data.iconViewBox ?? "0 0 24 24")}
             preserveAspectRatio="xMidYMid meet"
             style={{ color: String(data.iconColor ?? "#4b5563") }}
-            dangerouslySetInnerHTML={{ __html: String(data.iconBody) }}
+            dangerouslySetInnerHTML={{ __html: sanitizedIconBody }}
             data-story-active={isStoryTarget ? "true" : undefined}
           />
         ) : (

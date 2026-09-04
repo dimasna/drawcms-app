@@ -114,13 +114,13 @@ export async function searchIcons(
   return results;
 }
 
-/** Sanitize an Iconify SVG payload into embeddable markup plus a viewBox. */
-export function sanitizeIconSvg(svgText: string, icon: string): { body: string; viewBox: string } {
-  const doc = new DOMParser().parseFromString(svgText, "text/html");
-  const root = doc.body?.querySelector("svg");
-  if (!root) {
-    throw new IconifyError(`"${icon}" is not a readable icon.`, "Choose a different icon.");
-  }
+/**
+ * Shared SVG trust boundary: remove dangerous elements and attributes so the
+ * remaining markup is embeddable. Used by both freshly fetched artwork
+ * (`sanitizeIconSvg`) and stored icon bodies re-entering the app from files,
+ * storage, or host imports (`sanitizeIconBody`).
+ */
+function cleanSvgTree(root: Element) {
   const walk = (element: Element) => {
     for (const child of Array.from(element.children)) {
       if (FORBIDDEN_ICON_TAGS.has(child.tagName.toLowerCase())) {
@@ -144,6 +144,16 @@ export function sanitizeIconSvg(svgText: string, icon: string): { body: string; 
     }
   };
   walk(root);
+}
+
+/** Sanitize an Iconify SVG payload into embeddable markup plus a viewBox. */
+export function sanitizeIconSvg(svgText: string, icon: string): { body: string; viewBox: string } {
+  const doc = new DOMParser().parseFromString(svgText, "text/html");
+  const root = doc.body?.querySelector("svg");
+  if (!root) {
+    throw new IconifyError(`"${icon}" is not a readable icon.`, "Choose a different icon.");
+  }
+  cleanSvgTree(root);
   const rawViewBox = root.getAttribute("viewBox")?.trim();
   const viewBox = rawViewBox && /^[-\d.\s]+$/.test(rawViewBox) ? rawViewBox : DEFAULT_ICON_VIEWBOX;
   const body = root.innerHTML;
@@ -154,6 +164,24 @@ export function sanitizeIconSvg(svgText: string, icon: string): { body: string; 
     );
   }
   return { body, viewBox };
+}
+
+/**
+ * Sanitize a stored SVG inner-body fragment (e.g. a document's `iconBody`)
+ * into embeddable markup. Documents round-trip through files, browser
+ * storage, and host/plugin imports, so every render must apply the same
+ * trust boundary as freshly fetched artwork (DM-SEC-1). Unreadable or
+ * oversized bodies collapse to empty markup.
+ */
+export function sanitizeIconBody(body: string): string {
+  if (typeof body !== "string" || body.length === 0 || body.length > ICON_BODY_MAX_LENGTH) {
+    return "";
+  }
+  const doc = new DOMParser().parseFromString(`<svg>${body}</svg>`, "text/html");
+  const root = doc.body?.querySelector("svg");
+  if (!root) return "";
+  cleanSvgTree(root);
+  return root.innerHTML;
 }
 
 /** Fetch one icon's SVG from the API and sanitize it for document storage. */
