@@ -554,7 +554,11 @@ function relationship(
   purpose: string,
   sequenceConnectorType?: string,
   recommendedMotionPreset?: string,
-  loop = false,
+  // Relationship flow loops continuously by default, matching the WebMCP
+  // motion tools' DEFAULT_MOTION_LOOP so recommend → replace round-trips
+  // keep the animation alive. Sequence recommendations override this at
+  // recommendation time because looping messages hide chronology.
+  loop = true,
 ): VisualRelationshipGrammar {
   return {
     id,
@@ -723,7 +727,11 @@ export function recommendVisualGrammar(input: {
           : null,
       routing: grammar.routing,
       motionPreset: motionPreset ?? null,
-      loop: input.diagramType === "sequence" ? false : grammar.loop,
+      // Loop whenever a flow preset is actually recommended, except sequence
+      // diagrams whose numbered message rows must play once in order (the
+      // validator flags simultaneous looping sequence messages as
+      // SIMULTANEOUS_SEQUENCE_LOOPS). With no preset there is nothing to loop.
+      loop: motionPreset !== null && input.diagramType !== "sequence" ? grammar.loop : false,
       order: index + 1,
       startAfterMs: input.animationGoal === "explain-flow" ? index * 1_000 : 0,
       rationale: grammar.purpose,
@@ -738,7 +746,7 @@ export function recommendVisualGrammar(input: {
         : "Use the semantic conventions of the selected diagram type and minimize connector crossings.",
     animation:
       input.animationGoal === "explain-flow"
-        ? "Play relationships once in order. Loop the whole scene only after the final step."
+        ? "Flow animations loop continuously and start in relationship order; presentation steps sequence the narration."
         : input.animationGoal === "none"
           ? "Keep the diagram static."
           : "Animate only the element or relationship currently being explained.",

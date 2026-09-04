@@ -84,6 +84,36 @@ describe("DrawCMS visual grammar", () => {
     expect(result.relationships.every((entry) => entry.loop === false)).toBe(true);
   });
 
+  it("recommends continuously looping flow motion outside sequence chronology", () => {
+    const result = recommendVisualGrammar({
+      diagramType: "data-flow",
+      animationGoal: "explain-flow",
+      entities: [
+        { id: "client", label: "Client", role: "user" },
+        { id: "gateway", label: "API Gateway", role: "api" },
+        { id: "queue", label: "Order Queue", role: "queue" },
+      ],
+      relationships: [
+        { source: "client", target: "gateway", kind: "request", label: "POST /checkout" },
+        { source: "gateway", target: "queue", kind: "async", label: "enqueue order" },
+      ],
+    });
+
+    expect(result.relationships.map((entry) => entry.loop)).toEqual([true, true]);
+    expect(result.animation).toContain("loop continuously");
+
+    const staticResult = recommendVisualGrammar({
+      diagramType: "data-flow",
+      animationGoal: "none",
+      entities: [
+        { id: "a", label: "A" },
+        { id: "b", label: "B" },
+      ],
+      relationships: [{ source: "a", target: "b", label: "depends" }],
+    });
+    expect(staticResult.relationships.every((entry) => entry.loop === false)).toBe(true);
+  });
+
   it("detects semantic shape and choreography mistakes", () => {
     const document = createDocumentFromWebMCP({
       name: "Sequence mistakes",
